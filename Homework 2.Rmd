@@ -1,0 +1,27 @@
+---
+title: "Homework 2"
+author: "Mari Sanders"
+date: "2024-09-24"
+output: github_document
+---
+```{r message=FALSE, }
+library(tidyverse)
+library(readxl)
+```
+
+# Problem 1 
+
+```{r}
+transit_df <- read_csv("data/nyc_subway_data.csv") %>% janitor::clean_names() %>% 
+  select(
+    c("line", "station_name", "station_latitude", "station_longitude", "route1", "route2", "route3", "route4", "route5", "route6", "route7", "route8", "route9", "route10", "route11", "entry", "vending", "entrance_type", "ada")
+  ) %>% 
+  mutate(
+    entry = case_match(
+      entry, 
+      "YES" ~ TRUE, 
+      "NO" ~ FALSE
+    )
+  )
+```
+
