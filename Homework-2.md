@@ -11,9 +11,13 @@ library(readxl)
 # Problem 1
 
 ``` r
-transit_df <- read_csv("data/nyc_subway_data.csv") %>% janitor::clean_names() %>% 
+transit_df <- read_csv("data_hw2/nyc_subway_data.csv") %>% 
+  janitor::clean_names() %>% 
   select(
-    c("line", "station_name", "station_latitude", "station_longitude", "route1", "route2", "route3", "route4", "route5", "route6", "route7", "route8", "route9", "route10", "route11", "entry", "vending", "entrance_type", "ada")
+    -c("division", "entrance_type", "exit_only", "staffing", "staff_hours",
+       "ada_notes", "free_crossover", "north_south_street", "east_west_street", 
+       "corner", "entrance_latitude", "entrance_longitude", "station_location", 
+       "entrance_location")
   ) %>% 
   mutate(
     entry = case_match(
@@ -33,3 +37,41 @@ transit_df <- read_csv("data/nyc_subway_data.csv") %>% janitor::clean_names() %>
     ## 
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+# Problem 2
+
+``` r
+mr_trash_wheel_df <- read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xlsx", 
+                                range = "A2:N586", sheet = "Mr. Trash Wheel") %>% 
+  janitor::clean_names() %>% 
+  select(
+    -c("month", "year", "date", "homes_powered")
+  ) %>% 
+  mutate(
+    sports_balls, sports_balls = as.integer(sports_balls)) %>% 
+  mutate(trash_wheel = "Mr.")
+
+
+prof_trash_wheel_df <- 
+  read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xlsx", 
+             range = "A2:M108", sheet = "Professor Trash Wheel") %>% 
+  janitor::clean_names() %>% 
+  select(
+    -c("month", "year", "date", "homes_powered")
+  ) %>% 
+  mutate(trash_wheel = "Professor")
+
+gwynnda_df <- 
+  read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xlsx", 
+             range = "A2:L157", sheet = "Gwynnda Trash Wheel") %>% 
+  janitor::clean_names() %>% 
+  select(
+    -c("month", "year", "date", "homes_powered")) %>% 
+  mutate(
+    trash_wheel = "Gwynnda"
+  )
+
+trash_wheel_df <- 
+  bind_rows(mr_trash_wheel_df, prof_trash_wheel_df,gwynnda_df) %>% 
+  relocate(trash_wheel, .after = dumpster)
+```
