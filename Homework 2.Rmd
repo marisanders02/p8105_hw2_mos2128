@@ -12,7 +12,7 @@ library(readxl)
 # Problem 1 
 
 ```{r}
-transit_df <- read_csv("data/nyc_subway_data.csv") %>% janitor::clean_names() %>% 
+transit_df <- read_csv("data_hw2/nyc_subway_data.csv") %>% janitor::clean_names() %>% 
   select(
     c("line", "station_name", "station_latitude", "station_longitude", "route1", "route2", "route3", "route4", "route5", "route6", "route7", "route8", "route9", "route10", "route11", "entry", "vending", "entrance_type", "ada")
   ) %>% 
@@ -23,5 +23,13 @@ transit_df <- read_csv("data/nyc_subway_data.csv") %>% janitor::clean_names() %>
       "NO" ~ FALSE
     )
   )
+```
+
+
+# Problem 2 
+```{r}
+trash_wheel_df <- read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xlsx", range = "A2:N586", sheet = "Mr. Trash Wheel") %>% 
+  janitor::clean_names() %>% 
+  
 ```
 
