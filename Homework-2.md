@@ -5,6 +5,7 @@ Mari Sanders
 ``` r
 library(tidyverse)
 library(readxl)
+options(scipen=999)
 ```
 
 # Problem 1
@@ -104,11 +105,12 @@ mr_trash_wheel_df <- read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xls
                                 range = "A2:N586", sheet = "Mr. Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(
-    -c("month", "year", "date", "homes_powered")
+    -c("homes_powered")
   ) %>% 
   mutate(
     sports_balls, sports_balls = as.integer(sports_balls)) %>% 
-  mutate(trash_wheel = "Mr.")
+  mutate(trash_wheel = "mr.") %>% 
+  mutate(year, year = as.numeric(year))
 
 
 prof_trash_wheel_df <- 
@@ -116,24 +118,59 @@ prof_trash_wheel_df <-
              range = "A2:M108", sheet = "Professor Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(
-    -c("dumpster","month", "year", "date", "homes_powered")
+    -c( "homes_powered")
   ) %>% 
-  mutate(trash_wheel = "Professor")
+  mutate(trash_wheel = "professor") %>% 
+  mutate(year, year = as.numeric(year))
 
 gwynnda_df <- 
   read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xlsx", 
              range = "A2:L157", sheet = "Gwynnda Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(
-    -c("dumpster","month", "year", "date", "homes_powered")) %>% 
+    -c("homes_powered")) %>% 
   mutate(
-    trash_wheel = "Gwynnda"
-  )
+    trash_wheel = "gwynnda"
+  ) %>% 
+  mutate(year,year = as.numeric(year))
 
 trash_wheel_df <- 
   bind_rows(mr_trash_wheel_df, prof_trash_wheel_df,gwynnda_df) %>% 
-  relocate(trash_wheel, .before = weight_tons)
+  relocate(trash_wheel, .before = month)
 ```
+
+This data contains variables dumpster, trash_wheel, month, year, date,
+weight_tons, volume_cubic_yards, plastic_bottles, polystyrene,
+cigarette_butts, glass_bottles, plastic_bags, wrappers, sports_balls. To
+clean each of the data sets, I used `clean_names()` from the package
+`janitor`, then I selected only the variables that I needed, which were
+all the columns that contained information about the dumpster-specific
+information. Finally, to keep track of which trash wheel the data is
+from, I created a variable called `trash_wheel` that contained values
+`mr.`, `gwynnda`, or `professor`. There are 845 observations and 14
+variables.
+
+``` r
+total_weight_prof <- 
+  trash_wheel_df %>% 
+  filter(trash_wheel == "professor") %>% 
+  pull(weight_tons) %>% 
+  sum()
+```
+
+The total weight collected by Professor Trash Wheel is 216.26 tons.
+
+``` r
+cig_butts_gwynnda <- 
+  trash_wheel_df %>% 
+  filter(trash_wheel == "gwynnda") %>% 
+  filter(year == 2022) %>% 
+  filter(month == "June") %>% 
+  pull(cigarette_butts) %>% 
+  sum()
+```
+
+Gwynnda collected 18120 cigarette butts in June 2022.
 
 ## Problem 3
 
