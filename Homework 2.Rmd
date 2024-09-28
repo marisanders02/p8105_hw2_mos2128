@@ -28,7 +28,7 @@ transit_df <- read_csv("data_hw2/nyc_subway_data.csv") %>%
   ) 
 ```
 
-The data contains the variables,`r names(transit_df)` To clean the data, I started by using the `clean_names()` function from the `janitor` package. Then I selected only the rows that were needed for the analysis by using `select()`. Next, I changed the entry variable to a logical variable instead of a character variable. This is fairly tidy, except the routes that each station serve it a bit hard to understand. This cleaned data contains `r nrow(transit_df)` rows and `r ncol(transit_df)` columns. 
+The data contains the variables `r names(transit_df)`. To clean the data, I started by using the `clean_names()` function from the `janitor` package. Then I selected only the rows that were needed for the analysis by using `select()`. Next, I changed the entry variable to a logical variable instead of a character variable. This is fairly tidy, except the routes that each station serve it a bit hard to understand. This cleaned data contains `r nrow(transit_df)` rows and `r ncol(transit_df)` columns. 
 
 ```{r}
 distinct_station <- 
@@ -46,7 +46,7 @@ ada_compliant <- transit_df %>%
   nrow()
 ```
 
-There are ` r ada_compliant` stations. 
+There are `r ada_compliant` ada compliant stations. 
 
 ```{r}
 clean_transit <- transit_df %>% 

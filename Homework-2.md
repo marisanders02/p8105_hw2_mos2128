@@ -37,9 +37,9 @@ transit_df <- read_csv("data_hw2/nyc_subway_data.csv") %>%
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
-The data contains the variables,line, station_name, station_latitude,
+The data contains the variables line, station_name, station_latitude,
 station_longitude, route1, route2, route3, route4, route5, route6,
-route7, route8, route9, route10, route11, entry, vending, ada To clean
+route7, route8, route9, route10, route11, entry, vending, ada. To clean
 the data, I started by using the `clean_names()` function from the
 `janitor` package. Then I selected only the rows that were needed for
 the analysis by using `select()`. Next, I changed the entry variable to
@@ -63,7 +63,7 @@ ada_compliant <- transit_df %>%
   nrow()
 ```
 
-There are `r ada_compliant` stations.
+There are 84 ada compliant stations.
 
 ``` r
 clean_transit <- transit_df %>% 
