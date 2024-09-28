@@ -1,7 +1,6 @@
 Homework 2
 ================
 Mari Sanders
-2024-09-24
 
 ``` r
 library(tidyverse)
@@ -25,7 +24,7 @@ transit_df <- read_csv("data_hw2/nyc_subway_data.csv") %>%
       "YES" ~ TRUE, 
       "NO" ~ FALSE
     )
-  )
+  ) 
 ```
 
     ## Rows: 1868 Columns: 32
@@ -38,6 +37,66 @@ transit_df <- read_csv("data_hw2/nyc_subway_data.csv") %>%
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
+The data contains the variables,line, station_name, station_latitude,
+station_longitude, route1, route2, route3, route4, route5, route6,
+route7, route8, route9, route10, route11, entry, vending, ada To clean
+the data, I started by using the `clean_names()` function from the
+`janitor` package. Then I selected only the rows that were needed for
+the analysis by using `select()`. Next, I changed the entry variable to
+a logical variable instead of a character variable. This is fairly tidy,
+except the routes that each station serve it a bit hard to understand.
+This cleaned data contains 1868 rows and 18 columns.
+
+``` r
+distinct_station <- 
+  transit_df %>%
+  distinct(line, station_name) %>%
+  nrow()
+```
+
+There are 465 distinct stations in this dataset.
+
+``` r
+ada_compliant <- transit_df %>% 
+  filter(ada == "TRUE") %>% 
+  distinct(line, station_name) %>% 
+  nrow()
+```
+
+There are `r ada_compliant` stations.
+
+``` r
+clean_transit <- transit_df %>% 
+  mutate(
+    across(starts_with("route"), 
+           as.character)
+  ) %>% 
+  pivot_longer(
+    cols = route1:route11,
+    names_to = "route_number",
+    values_to = "route_name"
+  ) 
+```
+
+``` r
+a_stations <- clean_transit %>% 
+  filter(route_name == "A") %>%  
+  distinct(line, station_name) %>%  
+  nrow()
+```
+
+There are 60 distinct stations that serve the A train
+
+``` r
+a_ada_stations <- 
+  clean_transit %>% 
+  filter(route_name == "A" & ada == "TRUE") %>%  
+  distinct(line, station_name) %>%  
+  nrow()
+```
+
+There are 17 stations that serve the a train and are ada accessible.
+
 # Problem 2
 
 ``` r
@@ -45,7 +104,7 @@ mr_trash_wheel_df <- read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xls
                                 range = "A2:N586", sheet = "Mr. Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(
-    -c("dumpster","month", "year", "date", "homes_powered")
+    -c("month", "year", "date", "homes_powered")
   ) %>% 
   mutate(
     sports_balls, sports_balls = as.integer(sports_balls)) %>% 

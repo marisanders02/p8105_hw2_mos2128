@@ -1,7 +1,6 @@
 ---
 title: "Homework 2"
 author: "Mari Sanders"
-date: "2024-09-24"
 output: github_document
 ---
 ```{r message=FALSE, }
@@ -26,9 +25,60 @@ transit_df <- read_csv("data_hw2/nyc_subway_data.csv") %>%
       "YES" ~ TRUE, 
       "NO" ~ FALSE
     )
-  )
+  ) 
 ```
 
+The data contains the variables,`r names(transit_df)` To clean the data, I started by using the `clean_names()` function from the `janitor` package. Then I selected only the rows that were needed for the analysis by using `select()`. Next, I changed the entry variable to a logical variable instead of a character variable. This is fairly tidy, except the routes that each station serve it a bit hard to understand. This cleaned data contains `r nrow(transit_df)` rows and `r ncol(transit_df)` columns. 
+
+```{r}
+distinct_station <- 
+  transit_df %>%
+  distinct(line, station_name) %>%
+  nrow()
+```
+
+There are `r distinct_station` distinct stations in this dataset. 
+
+```{r}
+ada_compliant <- transit_df %>% 
+  filter(ada == "TRUE") %>% 
+  distinct(line, station_name) %>% 
+  nrow()
+```
+
+There are ` r ada_compliant` stations. 
+
+```{r}
+clean_transit <- transit_df %>% 
+  mutate(
+    across(starts_with("route"), 
+           as.character)
+  ) %>% 
+  pivot_longer(
+    cols = route1:route11,
+    names_to = "route_number",
+    values_to = "route_name"
+  ) 
+```
+
+```{r}
+a_stations <- clean_transit %>% 
+  filter(route_name == "A") %>%  
+  distinct(line, station_name) %>%  
+  nrow()
+```
+
+There are `r a_stations` distinct stations that serve the A train
+
+```{r}
+a_ada_stations <- 
+  clean_transit %>% 
+  filter(route_name == "A" & ada == "TRUE") %>%  
+  distinct(line, station_name) %>%  
+  nrow()
+```
+
+There are `r a_ada_stations` stations that serve the a train and are ada accessible. 
 
 # Problem 2 
 
@@ -37,7 +87,7 @@ mr_trash_wheel_df <- read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xls
                                 range = "A2:N586", sheet = "Mr. Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(
-    -c("dumpster","month", "year", "date", "homes_powered")
+    -c("month", "year", "date", "homes_powered")
   ) %>% 
   mutate(
     sports_balls, sports_balls = as.integer(sports_balls)) %>% 
