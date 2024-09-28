@@ -5,7 +5,7 @@ Mari Sanders
 ``` r
 library(tidyverse)
 library(readxl)
-options(scipen=999)
+options(scipen = 999)
 ```
 
 # Problem 1
@@ -177,7 +177,8 @@ Gwynnda collected 18120 cigarette butts in June 2022.
 ``` r
 baker_df <- 
   read_csv("data_hw2/bakers.csv") %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  arrange(series)
 ```
 
     ## Rows: 120 Columns: 5
@@ -192,7 +193,8 @@ baker_df <-
 ``` r
 bakes_df <- 
   read_csv("data_hw2/bakes.csv") %>%
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  select(-c("baker"))
 ```
 
     ## Rows: 548 Columns: 5
@@ -207,7 +209,15 @@ bakes_df <-
 ``` r
 results_df <- 
   read_csv("data_hw2/viewers.csv") %>% 
-  janitor::clean_names() 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    cols = series_1:series_10,
+    names_to = "season", 
+    names_prefix = "series_"
+  ) %>% 
+  mutate(season, season = as.numeric(season)) %>% 
+  arrange(season) %>% 
+  relocate(season, .before = episode)
 ```
 
     ## Rows: 10 Columns: 11

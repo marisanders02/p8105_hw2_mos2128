@@ -6,7 +6,7 @@ output: github_document
 ```{r message=FALSE, }
 library(tidyverse)
 library(readxl)
-options(scipen=999)
+options(scipen = 999)
 ```
 
 # Problem 1 
@@ -151,15 +151,26 @@ Gwynnda collected `r cig_butts_gwynnda` cigarette butts in June 2022.
 ```{r}
 baker_df <- 
   read_csv("data_hw2/bakers.csv") %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  arrange(series)
 
 bakes_df <- 
   read_csv("data_hw2/bakes.csv") %>%
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  select(-c("baker"))
 
 results_df <- 
   read_csv("data_hw2/viewers.csv") %>% 
-  janitor::clean_names() 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    cols = series_1:series_10,
+    names_to = "season", 
+    names_prefix = "series_"
+  ) %>% 
+  mutate(season, season = as.numeric(season)) %>% 
+  arrange(season) %>% 
+  relocate(season, .before = episode)
+
 ```
 
 
