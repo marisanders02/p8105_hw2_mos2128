@@ -163,22 +163,18 @@ bakes_df <-
 results_df <- 
   read_csv("data_hw2/results.csv", skip = 2) %>% 
   janitor::clean_names()
-```
 
-```{r}
 final_data <- baker_df %>% 
   left_join(bakes_df, by = c(first_name = "baker", series = "series")) %>% 
   left_join(results_df, by = c(series = "series", episode = "episode", first_name = "baker")) %>% 
   relocate(series, episode, .before = "first_name")
-```
 
-
-```{r }
 final_data %>% 
   filter(series > 5) %>% 
     filter(result == "STAR BAKER" | result == "WINNER") %>% 
-  knitr::kable()
+  knitr::kable(., col.names = c("Season", "Episode", "First Name", "Last Name", "Age", "Occupation", "Hometown", "Signature Bake", "Show Stopper", "Technical Score", "Result")) 
 ```
+
 
 
 ```{r}
