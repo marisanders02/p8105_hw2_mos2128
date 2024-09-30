@@ -149,17 +149,40 @@ Gwynnda collected `r cig_butts_gwynnda` cigarette butts in June 2022.
 ## Problem 3 
 
 ```{r}
+
 baker_df <- 
   read_csv("data_hw2/bakers.csv") %>% 
   janitor::clean_names() %>% 
-  arrange(series)
+  arrange(series) %>% 
+  separate(baker_name, into = c("first_name", "last_name"), sep = " ")
 
 bakes_df <- 
   read_csv("data_hw2/bakes.csv") %>%
-  janitor::clean_names() %>% 
-  select(-c("baker"))
+  janitor::clean_names() 
 
 results_df <- 
+  read_csv("data_hw2/results.csv", skip = 2) %>% 
+  janitor::clean_names()
+```
+
+```{r}
+final_data <- baker_df %>% 
+  left_join(bakes_df, by = c(first_name = "baker", series = "series")) %>% 
+  left_join(results_df, by = c(series = "series", episode = "episode", first_name = "baker")) %>% 
+  relocate(series, episode, .before = "first_name")
+```
+
+
+```{r }
+final_data %>% 
+  filter(series > 5) %>% 
+    filter(result == "STAR BAKER" | result == "WINNER") %>% 
+  knitr::kable()
+```
+
+
+```{r}
+viewership_df <- 
   read_csv("data_hw2/viewers.csv") %>% 
   janitor::clean_names() %>% 
   pivot_longer(
@@ -169,8 +192,21 @@ results_df <-
   ) %>% 
   mutate(season, season = as.numeric(season)) %>% 
   arrange(season) %>% 
-  relocate(season, .before = episode)
+  relocate(season, .before = episode) 
 
-```
+head(viewership_df, 10)
 
+avg_view_1 <- 
+  viewership_df %>% 
+  filter(season == 1) %>% 
+  summarise(avg = mean(value, na.rm = TRUE))  %>% 
+  pull()
 
+avg_view_5 <- 
+  viewership_df %>% 
+  filter(season == 5) %>% 
+  summarise(avg = mean(value, na.rm = TRUE))  %>% 
+  pull()
+``` 
+
+The average viewership in Season 1 was `r avg_view_1`. The average viewership in Season 5 was `r avg_view_5`. 

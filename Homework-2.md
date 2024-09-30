@@ -178,7 +178,8 @@ Gwynnda collected 18120 cigarette butts in June 2022.
 baker_df <- 
   read_csv("data_hw2/bakers.csv") %>% 
   janitor::clean_names() %>% 
-  arrange(series)
+  arrange(series) %>% 
+  separate(baker_name, into = c("first_name", "last_name"), sep = " ")
 ```
 
     ## Rows: 120 Columns: 5
@@ -193,8 +194,7 @@ baker_df <-
 ``` r
 bakes_df <- 
   read_csv("data_hw2/bakes.csv") %>%
-  janitor::clean_names() %>% 
-  select(-c("baker"))
+  janitor::clean_names() 
 ```
 
     ## Rows: 548 Columns: 5
@@ -208,6 +208,68 @@ bakes_df <-
 
 ``` r
 results_df <- 
+  read_csv("data_hw2/results.csv", skip = 2) %>% 
+  janitor::clean_names()
+```
+
+    ## Rows: 1136 Columns: 5
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): baker, result
+    ## dbl (3): series, episode, technical
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+final_data <- baker_df %>% 
+  left_join(bakes_df, by = c(first_name = "baker", series = "series")) %>% 
+  left_join(results_df, by = c(series = "series", episode = "episode", first_name = "baker")) %>% 
+  relocate(series, episode, .before = "first_name")
+```
+
+``` r
+final_data %>% 
+  filter(series > 5) %>% 
+    filter(result == "STAR BAKER" | result == "WINNER") %>% 
+  knitr::kable()
+```
+
+| series | episode | first_name | last_name     | baker_age | baker_occupation                           | hometown                        | signature_bake                                                                    | show_stopper                                                      | technical | result     |
+|-------:|--------:|:-----------|:--------------|----------:|:-------------------------------------------|:--------------------------------|:----------------------------------------------------------------------------------|:------------------------------------------------------------------|----------:|:-----------|
+|      6 |       2 | Ian        | Cumming       |        41 | Travel photographer                        | Great Wilbraham, Cambridgeshire | Orange, Rosemary and Almond Biscotti                                              | Sandwich de la Confiture                                          |         3 | STAR BAKER |
+|      6 |       3 | Ian        | Cumming       |        41 | Travel photographer                        | Great Wilbraham, Cambridgeshire | Wild Garlic Pesto Soda Breads                                                     | Flour Power                                                       |         1 | STAR BAKER |
+|      6 |       4 | Ian        | Cumming       |        41 | Travel photographer                        | Great Wilbraham, Cambridgeshire | Pomegranate Two Ways Crème Brûlées                                                | Trio of Spicy and Herby Baked Cheesecakes                         |         4 | STAR BAKER |
+|      6 |       1 | Marie      | Campbell      |        66 | Retired                                    | Auchterarder, Perthshire        | Zingy Citrus Madeira Cake                                                         | A Walk in the Black Forest                                        |         3 | STAR BAKER |
+|      6 |       6 | Mat        | Riley         |        37 | Fire fighter                               | London                          | Piña Colada Frangipane Tart                                                       | His ‘n’ Hers Vol-au-vents                                         |         1 | STAR BAKER |
+|      6 |       5 | Nadiya     | Hussain       |        30 | Full-time mother                           | Leeds / Luton                   | Naked Blueberry and Caraway Crunch Cake                                           | Chocolate and Strawberry Lime Ice Cream Roll                      |         1 | STAR BAKER |
+|      6 |       8 | Nadiya     | Hussain       |        30 | Full-time mother                           | Leeds / Luton                   | Rose Pistachio and Mocha Hazelnut Horns                                           | Bubble Gum and Peppermint Cream Religieuse à l’ancienne           |         1 | STAR BAKER |
+|      6 |       9 | Nadiya     | Hussain       |        30 | Full-time mother                           | Leeds / Luton                   | Peanut Salted Caramel and Chocolate Tart                                          | Peacock in Nan’s Door                                             |         4 | STAR BAKER |
+|      6 |      10 | Nadiya     | Hussain       |        30 | Full-time mother                           | Leeds / Luton                   | Cardamom and Almond Buns & Nutmeg and Sour Cherry Fingers                         | My Big Fat British Wedding Cake                                   |         1 | WINNER     |
+|      6 |       7 | Tamal      | Ray           |        29 | Trainee anaesthetist                       | Manchester                      | Middle Eastern Game Pie                                                           | Spiced Blackberry, Raspberry and Cardamom Charlotte Russe         |         3 | STAR BAKER |
+|      7 |       7 | Andrew     | Smyth         |        25 | Aerospace engineer                         | Derby / Holywood, County Down   | Tropical Holiday Roulade                                                          | Childhood Ice Cream Mousse Cakes                                  |         1 | STAR BAKER |
+|      7 |       9 | Andrew     | Smyth         |        25 | Aerospace engineer                         | Derby / Holywood, County Down   | Cheesy Elephant Ears and Herby Treble Clefs                                       | Philharmonic Fondants                                             |         2 | STAR BAKER |
+|      7 |       4 | Benjamina  | Ebuehi        |        23 | Teaching assistant                         | South London                    | Red Onion Chutney, Brie and Bacon Yorkshire Puddings                              | Tropical Churros                                                  |         1 | STAR BAKER |
+|      7 |       2 | Candice    | Brown         |        31 | PE teacher                                 | Barton-Le-Clay, Bedfordshire    | Salted Caramel, Chocolate Iced Shiny Hearts                                       | Gingerbread Pub with Sticky Ginger Carpet                         |         8 | STAR BAKER |
+|      7 |       5 | Candice    | Brown         |        31 | PE teacher                                 | Barton-Le-Clay, Bedfordshire    | Danish Pastry Croque Monsieur Kites and Cinnamon Apple, Vanilla Crème Rose Danish | Sausage, Black Pudding and Apple Rounds and Banoffee Whiskey Cups |         2 | STAR BAKER |
+|      7 |       8 | Candice    | Brown         |        31 | PE teacher                                 | Barton-Le-Clay, Bedfordshire    | Cheesy Cheeky Fish Pies                                                           | Peacock                                                           |         1 | STAR BAKER |
+|      7 |      10 | Candice    | Brown         |        31 | PE teacher                                 | Barton-Le-Clay, Bedfordshire    | Queen Victoria’s Mango and Strawberry Crown                                       | Picnic for Pearly Kings and Queens                                |         2 | WINNER     |
+|      7 |       1 | Jane       | Beedle        |        61 | Garden designer                            | Beckenham                       | Lemon and Poppy Seed Drizzle Cake                                                 | Chocolate Orange Mirror Cake                                      |         7 | STAR BAKER |
+|      7 |       3 | Tom        | Gilliford     |        26 | Project engagement manager                 | Rochdale                        | Chocolate Orange and Chilli Swirl Bread                                           | Jörmungandr and Mjölnir                                           |         4 | STAR BAKER |
+|      7 |       6 | Tom        | Gilliford     |        26 | Project engagement manager                 | Rochdale                        | Blood Orange Halloween Pumpkin Pie                                                | Floral Tea Cake                                                   |         1 | STAR BAKER |
+|      8 |       3 | Julia      | Chernogorova  |        21 | Aviation Broker                            | Crawley, West Sussex            | Earl Grey Dried Fruit Teacakes                                                    | ‘The Snail Under a Mushroom’ Bread Sculpture                      |         2 | STAR BAKER |
+|      8 |       4 | Kate       | Lyon          |        29 | Health and safety inspector                | Merseyside                      | Salted Bay Caramel Millionaire Shortbreads                                        | Sticky Toffee Apple Caramel Cake                                  |         6 | STAR BAKER |
+|      8 |       6 | Liam       | Charles       |        19 | Student                                    | North London                    | ‘Standard FC’ Decorative Pies                                                     | ‘Nan’s Sunday Dinner’ Pie                                         |         4 | STAR BAKER |
+|      8 |       5 | Sophie     | Faldo         |        33 | Former army officer and trainee stuntwoman | West Molesey, Surrey            | Ginger, Fig and Honey Steamed School Pudding                                      | Raspberry, Yuzu & White Chocolate Bûche Trifle Terrine            |         1 | STAR BAKER |
+|      8 |       9 | Sophie     | Faldo         |        33 | Former army officer and trainee stuntwoman | West Molesey, Surrey            | Strawberry & Rhubarb and Chestnut & Vanilla Choux Buns                            | ‘Tutu with Opera Filling’ Meringue Centrepiece                    |         1 | STAR BAKER |
+|      8 |      10 | Sophie     | Faldo         |        33 | Former army officer and trainee stuntwoman | West Molesey, Surrey            | Spelt Boules, Mushroom Ciabatta and Orange Plaited Brioche                        | ‘Ode to the Honey Bee’ Entremet                                   |         2 | WINNER     |
+|      8 |       8 | Stacey     | Hart          |        42 | Former school teacher                      | Radlett, Hertfordshire          | Camembert & Onion and Apple & Blueberry Bedfordshire Clangers                     | ‘Bright’ Lemon & Orange Savoy Cake                                |         3 | STAR BAKER |
+|      8 |       1 | Steven     | Carter-Bailey |        34 | Marketer                                   | Watford, Hertfordshire          | Bonfire Night Cake                                                                | ‘A Baker’s Lunch’ Cake                                            |         6 | STAR BAKER |
+|      8 |       2 | Steven     | Carter-Bailey |        34 | Marketer                                   | Watford, Hertfordshire          | Amarpressi Biscuits                                                               | ‘Check Bake’ Game                                                 |         6 | STAR BAKER |
+|      8 |       7 | Steven     | Carter-Bailey |        34 | Marketer                                   | Watford, Hertfordshire          | Italian Style Cannoli                                                             | ‘Sicilian-style’ Sfogliatelle                                     |         1 | STAR BAKER |
+
+``` r
+viewership_df <- 
   read_csv("data_hw2/viewers.csv") %>% 
   janitor::clean_names() %>% 
   pivot_longer(
@@ -217,7 +279,7 @@ results_df <-
   ) %>% 
   mutate(season, season = as.numeric(season)) %>% 
   arrange(season) %>% 
-  relocate(season, .before = episode)
+  relocate(season, .before = episode) 
 ```
 
     ## Rows: 10 Columns: 11
@@ -227,3 +289,38 @@ results_df <-
     ## 
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+head(viewership_df, 10)
+```
+
+    ## # A tibble: 10 × 3
+    ##    season episode value
+    ##     <dbl>   <dbl> <dbl>
+    ##  1      1       1  2.24
+    ##  2      1       2  3   
+    ##  3      1       3  3   
+    ##  4      1       4  2.6 
+    ##  5      1       5  3.03
+    ##  6      1       6  2.75
+    ##  7      1       7 NA   
+    ##  8      1       8 NA   
+    ##  9      1       9 NA   
+    ## 10      1      10 NA
+
+``` r
+avg_view_1 <- 
+  viewership_df %>% 
+  filter(season == 1) %>% 
+  summarise(avg = mean(value, na.rm = TRUE))  %>% 
+  pull()
+
+avg_view_5 <- 
+  viewership_df %>% 
+  filter(season == 5) %>% 
+  summarise(avg = mean(value, na.rm = TRUE))  %>% 
+  pull()
+```
+
+The average viewership in Season 1 was 2.77. The average viewership in
+Season 5 was 10.0393.
