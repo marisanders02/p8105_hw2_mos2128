@@ -84,8 +84,7 @@ There are `r a_ada_stations` stations that serve the a train and are ada accessi
 # Problem 2 
 
 ```{r}
-mr_trash_wheel_df <- read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xlsx", 
-                                range = "A2:N586", sheet = "Mr. Trash Wheel") %>% 
+mr_trash_wheel_df <-read_excel("data_hw2/202409_Trash_Wheel_Collection_Data.xlsx",range = "A2:N653", sheet = "Mr. Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(
     -c("homes_powered")
@@ -97,8 +96,8 @@ mr_trash_wheel_df <- read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xls
 
 
 prof_trash_wheel_df <- 
-  read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xlsx", 
-             range = "A2:M108", sheet = "Professor Trash Wheel") %>% 
+  read_excel("data_hw2/202409_Trash_Wheel_Collection_Data.xlsx", 
+             range = "A2:M121", sheet = "Professor Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(
     -c( "homes_powered")
@@ -107,8 +106,8 @@ prof_trash_wheel_df <-
   mutate(year, year = as.numeric(year))
 
 gwynnda_df <- 
-  read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xlsx", 
-             range = "A2:L157", sheet = "Gwynnda Trash Wheel") %>% 
+  read_excel("data_hw2/202409_Trash_Wheel_Collection_Data.xlsx", 
+             range = "A2:L265", sheet = "Gwynnda Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(
     -c("homes_powered")) %>% 
@@ -119,7 +118,7 @@ gwynnda_df <-
 
 trash_wheel_df <- 
   bind_rows(mr_trash_wheel_df, prof_trash_wheel_df,gwynnda_df) %>% 
-  relocate(trash_wheel, .before = month)
+  relocate(trash_wheel, .after = month)
 ```
 
 This data contains variables `r names(trash_wheel_df)`. To clean each of the data sets, I used `clean_names()` from the package `janitor`, then I selected only the variables that I needed, which were all the columns that contained information about the dumpster-specific information. Finally, to keep track of which trash wheel the data is from, I created a variable called `trash_wheel` that contained values `mr.`, `gwynnda`, or `professor`. There are `r nrow(trash_wheel_df)` observations and `r ncol(trash_wheel_df)` variables. 
@@ -153,7 +152,6 @@ Gwynnda collected `r cig_butts_gwynnda` cigarette butts in June 2022.
 baker_df <- 
   read_csv("data_hw2/bakers.csv") %>% 
   janitor::clean_names() %>% 
-  arrange(series) %>% 
   separate(baker_name, into = c("first_name", "last_name"), sep = " ")
 
 bakes_df <- 
@@ -169,6 +167,13 @@ final_data <- baker_df %>%
   left_join(results_df, by = c(series = "series", episode = "episode", first_name = "baker")) %>% 
   relocate(series, episode, .before = "first_name")
 
+write_csv(final_data, "ggb_data.csv")
+```
+
+
+The first thing that I did with all of the datasets is I used the `clean_names()` function from the `janitor` package to make all the names of the columns easier to work with. For the `baker_df()`, I separated the `baker_name` into `first_name` and `last_name`, so that it would be easier to join the data later. To combine each of the data, I first used `left_join` by `first_name` and `series` because I wanted to have all of the data from `baker_df` to be included. Then I used `left_join` to join the `results_df` with the rest of the combined data by `series`, `episode` and `first_name`. Finally, to make the data more readable, I relocated `series` and `episode` to be before `first_name`. This dataset includes the variables `r names(final_data)`. It has `r ncol(final_data)` columns and `r nrow(final_data)` rows. This dataset is still a bit messy because in order to show each of the bakers `show_stopper` and `signature_bake`, the data about their  `series`, `episode`, `first_name`, `last_name`, `baker_age`, `baker_occupation`, and `hometown` are duplicated for the amount of times they baked a signature_bake and a show_stopper. I think it would be best to keep the data seperate and then use the data that you need from both of them, without combining them. 
+
+```{r}
 final_data %>% 
   filter(series > 5) %>% 
     filter(result == "STAR BAKER" | result == "WINNER") %>% 

@@ -101,8 +101,7 @@ There are 17 stations that serve the a train and are ada accessible.
 # Problem 2
 
 ``` r
-mr_trash_wheel_df <- read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xlsx", 
-                                range = "A2:N586", sheet = "Mr. Trash Wheel") %>% 
+mr_trash_wheel_df <-read_excel("data_hw2/202409_Trash_Wheel_Collection_Data.xlsx",range = "A2:N653", sheet = "Mr. Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(
     -c("homes_powered")
@@ -114,8 +113,8 @@ mr_trash_wheel_df <- read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xls
 
 
 prof_trash_wheel_df <- 
-  read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xlsx", 
-             range = "A2:M108", sheet = "Professor Trash Wheel") %>% 
+  read_excel("data_hw2/202409_Trash_Wheel_Collection_Data.xlsx", 
+             range = "A2:M121", sheet = "Professor Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(
     -c( "homes_powered")
@@ -124,8 +123,8 @@ prof_trash_wheel_df <-
   mutate(year, year = as.numeric(year))
 
 gwynnda_df <- 
-  read_excel("data_hw2/202309_Trash_Wheel_Collection_Data.xlsx", 
-             range = "A2:L157", sheet = "Gwynnda Trash Wheel") %>% 
+  read_excel("data_hw2/202409_Trash_Wheel_Collection_Data.xlsx", 
+             range = "A2:L265", sheet = "Gwynnda Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(
     -c("homes_powered")) %>% 
@@ -136,10 +135,10 @@ gwynnda_df <-
 
 trash_wheel_df <- 
   bind_rows(mr_trash_wheel_df, prof_trash_wheel_df,gwynnda_df) %>% 
-  relocate(trash_wheel, .before = month)
+  relocate(trash_wheel, .after = month)
 ```
 
-This data contains variables dumpster, trash_wheel, month, year, date,
+This data contains variables dumpster, month, trash_wheel, year, date,
 weight_tons, volume_cubic_yards, plastic_bottles, polystyrene,
 cigarette_butts, glass_bottles, plastic_bags, wrappers, sports_balls. To
 clean each of the data sets, I used `clean_names()` from the package
@@ -147,7 +146,7 @@ clean each of the data sets, I used `clean_names()` from the package
 all the columns that contained information about the dumpster-specific
 information. Finally, to keep track of which trash wheel the data is
 from, I created a variable called `trash_wheel` that contained values
-`mr.`, `gwynnda`, or `professor`. There are 845 observations and 14
+`mr.`, `gwynnda`, or `professor`. There are 1033 observations and 14
 variables.
 
 ``` r
@@ -158,7 +157,7 @@ total_weight_prof <-
   sum()
 ```
 
-The total weight collected by Professor Trash Wheel is 216.26 tons.
+The total weight collected by Professor Trash Wheel is NA tons.
 
 ``` r
 cig_butts_gwynnda <- 
@@ -178,7 +177,6 @@ Gwynnda collected 18120 cigarette butts in June 2022.
 baker_df <- 
   read_csv("data_hw2/bakers.csv") %>% 
   janitor::clean_names() %>% 
-  arrange(series) %>% 
   separate(baker_name, into = c("first_name", "last_name"), sep = " ")
 ```
 
@@ -227,6 +225,31 @@ final_data <- baker_df %>%
   left_join(results_df, by = c(series = "series", episode = "episode", first_name = "baker")) %>% 
   relocate(series, episode, .before = "first_name")
 
+write_csv(final_data, "ggb_data.csv")
+```
+
+The first thing that I did with all of the datasets is I used the
+`clean_names()` function from the `janitor` package to make all the
+names of the columns easier to work with. For the `baker_df()`, I
+separated the `baker_name` into `first_name` and `last_name`, so that it
+would be easier to join the data later. To combine each of the data, I
+first used `left_join` by `first_name` and `series` because I wanted to
+have all of the data from `baker_df` to be included. Then I used
+`left_join` to join the `results_df` with the rest of the combined data
+by `series`, `episode` and `first_name`. Finally, to make the data more
+readable, I relocated `series` and `episode` to be before `first_name`.
+This dataset includes the variables series, episode, first_name,
+last_name, baker_age, baker_occupation, hometown, signature_bake,
+show_stopper, technical, result. It has 11 columns and 566 rows. This
+dataset is still a bit messy because in order to show each of the bakers
+`show_stopper` and `signature_bake`, the data about their `series`,
+`episode`, `first_name`, `last_name`, `baker_age`, `baker_occupation`,
+and `hometown` are duplicated for the amount of times they baked a
+signature_bake and a show_stopper. I think it would be best to keep the
+data seperate and then use the data that you need from both of them,
+without combining them.
+
+``` r
 final_data %>% 
   filter(series > 5) %>% 
     filter(result == "STAR BAKER" | result == "WINNER") %>% 
@@ -235,16 +258,6 @@ final_data %>%
 
 | Season | Episode | First Name | Last Name     | Age | Occupation                                 | Hometown                        | Signature Bake                                                                    | Show Stopper                                                      | Technical Score | Result     |
 |-------:|--------:|:-----------|:--------------|----:|:-------------------------------------------|:--------------------------------|:----------------------------------------------------------------------------------|:------------------------------------------------------------------|----------------:|:-----------|
-|      6 |       2 | Ian        | Cumming       |  41 | Travel photographer                        | Great Wilbraham, Cambridgeshire | Orange, Rosemary and Almond Biscotti                                              | Sandwich de la Confiture                                          |               3 | STAR BAKER |
-|      6 |       3 | Ian        | Cumming       |  41 | Travel photographer                        | Great Wilbraham, Cambridgeshire | Wild Garlic Pesto Soda Breads                                                     | Flour Power                                                       |               1 | STAR BAKER |
-|      6 |       4 | Ian        | Cumming       |  41 | Travel photographer                        | Great Wilbraham, Cambridgeshire | Pomegranate Two Ways Crème Brûlées                                                | Trio of Spicy and Herby Baked Cheesecakes                         |               4 | STAR BAKER |
-|      6 |       1 | Marie      | Campbell      |  66 | Retired                                    | Auchterarder, Perthshire        | Zingy Citrus Madeira Cake                                                         | A Walk in the Black Forest                                        |               3 | STAR BAKER |
-|      6 |       6 | Mat        | Riley         |  37 | Fire fighter                               | London                          | Piña Colada Frangipane Tart                                                       | His ‘n’ Hers Vol-au-vents                                         |               1 | STAR BAKER |
-|      6 |       5 | Nadiya     | Hussain       |  30 | Full-time mother                           | Leeds / Luton                   | Naked Blueberry and Caraway Crunch Cake                                           | Chocolate and Strawberry Lime Ice Cream Roll                      |               1 | STAR BAKER |
-|      6 |       8 | Nadiya     | Hussain       |  30 | Full-time mother                           | Leeds / Luton                   | Rose Pistachio and Mocha Hazelnut Horns                                           | Bubble Gum and Peppermint Cream Religieuse à l’ancienne           |               1 | STAR BAKER |
-|      6 |       9 | Nadiya     | Hussain       |  30 | Full-time mother                           | Leeds / Luton                   | Peanut Salted Caramel and Chocolate Tart                                          | Peacock in Nan’s Door                                             |               4 | STAR BAKER |
-|      6 |      10 | Nadiya     | Hussain       |  30 | Full-time mother                           | Leeds / Luton                   | Cardamom and Almond Buns & Nutmeg and Sour Cherry Fingers                         | My Big Fat British Wedding Cake                                   |               1 | WINNER     |
-|      6 |       7 | Tamal      | Ray           |  29 | Trainee anaesthetist                       | Manchester                      | Middle Eastern Game Pie                                                           | Spiced Blackberry, Raspberry and Cardamom Charlotte Russe         |               3 | STAR BAKER |
 |      7 |       7 | Andrew     | Smyth         |  25 | Aerospace engineer                         | Derby / Holywood, County Down   | Tropical Holiday Roulade                                                          | Childhood Ice Cream Mousse Cakes                                  |               1 | STAR BAKER |
 |      7 |       9 | Andrew     | Smyth         |  25 | Aerospace engineer                         | Derby / Holywood, County Down   | Cheesy Elephant Ears and Herby Treble Clefs                                       | Philharmonic Fondants                                             |               2 | STAR BAKER |
 |      7 |       4 | Benjamina  | Ebuehi        |  23 | Teaching assistant                         | South London                    | Red Onion Chutney, Brie and Bacon Yorkshire Puddings                              | Tropical Churros                                                  |               1 | STAR BAKER |
@@ -252,12 +265,19 @@ final_data %>%
 |      7 |       5 | Candice    | Brown         |  31 | PE teacher                                 | Barton-Le-Clay, Bedfordshire    | Danish Pastry Croque Monsieur Kites and Cinnamon Apple, Vanilla Crème Rose Danish | Sausage, Black Pudding and Apple Rounds and Banoffee Whiskey Cups |               2 | STAR BAKER |
 |      7 |       8 | Candice    | Brown         |  31 | PE teacher                                 | Barton-Le-Clay, Bedfordshire    | Cheesy Cheeky Fish Pies                                                           | Peacock                                                           |               1 | STAR BAKER |
 |      7 |      10 | Candice    | Brown         |  31 | PE teacher                                 | Barton-Le-Clay, Bedfordshire    | Queen Victoria’s Mango and Strawberry Crown                                       | Picnic for Pearly Kings and Queens                                |               2 | WINNER     |
+|      6 |       2 | Ian        | Cumming       |  41 | Travel photographer                        | Great Wilbraham, Cambridgeshire | Orange, Rosemary and Almond Biscotti                                              | Sandwich de la Confiture                                          |               3 | STAR BAKER |
+|      6 |       3 | Ian        | Cumming       |  41 | Travel photographer                        | Great Wilbraham, Cambridgeshire | Wild Garlic Pesto Soda Breads                                                     | Flour Power                                                       |               1 | STAR BAKER |
+|      6 |       4 | Ian        | Cumming       |  41 | Travel photographer                        | Great Wilbraham, Cambridgeshire | Pomegranate Two Ways Crème Brûlées                                                | Trio of Spicy and Herby Baked Cheesecakes                         |               4 | STAR BAKER |
 |      7 |       1 | Jane       | Beedle        |  61 | Garden designer                            | Beckenham                       | Lemon and Poppy Seed Drizzle Cake                                                 | Chocolate Orange Mirror Cake                                      |               7 | STAR BAKER |
-|      7 |       3 | Tom        | Gilliford     |  26 | Project engagement manager                 | Rochdale                        | Chocolate Orange and Chilli Swirl Bread                                           | Jörmungandr and Mjölnir                                           |               4 | STAR BAKER |
-|      7 |       6 | Tom        | Gilliford     |  26 | Project engagement manager                 | Rochdale                        | Blood Orange Halloween Pumpkin Pie                                                | Floral Tea Cake                                                   |               1 | STAR BAKER |
 |      8 |       3 | Julia      | Chernogorova  |  21 | Aviation Broker                            | Crawley, West Sussex            | Earl Grey Dried Fruit Teacakes                                                    | ‘The Snail Under a Mushroom’ Bread Sculpture                      |               2 | STAR BAKER |
 |      8 |       4 | Kate       | Lyon          |  29 | Health and safety inspector                | Merseyside                      | Salted Bay Caramel Millionaire Shortbreads                                        | Sticky Toffee Apple Caramel Cake                                  |               6 | STAR BAKER |
 |      8 |       6 | Liam       | Charles       |  19 | Student                                    | North London                    | ‘Standard FC’ Decorative Pies                                                     | ‘Nan’s Sunday Dinner’ Pie                                         |               4 | STAR BAKER |
+|      6 |       1 | Marie      | Campbell      |  66 | Retired                                    | Auchterarder, Perthshire        | Zingy Citrus Madeira Cake                                                         | A Walk in the Black Forest                                        |               3 | STAR BAKER |
+|      6 |       6 | Mat        | Riley         |  37 | Fire fighter                               | London                          | Piña Colada Frangipane Tart                                                       | His ‘n’ Hers Vol-au-vents                                         |               1 | STAR BAKER |
+|      6 |       5 | Nadiya     | Hussain       |  30 | Full-time mother                           | Leeds / Luton                   | Naked Blueberry and Caraway Crunch Cake                                           | Chocolate and Strawberry Lime Ice Cream Roll                      |               1 | STAR BAKER |
+|      6 |       8 | Nadiya     | Hussain       |  30 | Full-time mother                           | Leeds / Luton                   | Rose Pistachio and Mocha Hazelnut Horns                                           | Bubble Gum and Peppermint Cream Religieuse à l’ancienne           |               1 | STAR BAKER |
+|      6 |       9 | Nadiya     | Hussain       |  30 | Full-time mother                           | Leeds / Luton                   | Peanut Salted Caramel and Chocolate Tart                                          | Peacock in Nan’s Door                                             |               4 | STAR BAKER |
+|      6 |      10 | Nadiya     | Hussain       |  30 | Full-time mother                           | Leeds / Luton                   | Cardamom and Almond Buns & Nutmeg and Sour Cherry Fingers                         | My Big Fat British Wedding Cake                                   |               1 | WINNER     |
 |      8 |       5 | Sophie     | Faldo         |  33 | Former army officer and trainee stuntwoman | West Molesey, Surrey            | Ginger, Fig and Honey Steamed School Pudding                                      | Raspberry, Yuzu & White Chocolate Bûche Trifle Terrine            |               1 | STAR BAKER |
 |      8 |       9 | Sophie     | Faldo         |  33 | Former army officer and trainee stuntwoman | West Molesey, Surrey            | Strawberry & Rhubarb and Chestnut & Vanilla Choux Buns                            | ‘Tutu with Opera Filling’ Meringue Centrepiece                    |               1 | STAR BAKER |
 |      8 |      10 | Sophie     | Faldo         |  33 | Former army officer and trainee stuntwoman | West Molesey, Surrey            | Spelt Boules, Mushroom Ciabatta and Orange Plaited Brioche                        | ‘Ode to the Honey Bee’ Entremet                                   |               2 | WINNER     |
@@ -265,6 +285,9 @@ final_data %>%
 |      8 |       1 | Steven     | Carter-Bailey |  34 | Marketer                                   | Watford, Hertfordshire          | Bonfire Night Cake                                                                | ‘A Baker’s Lunch’ Cake                                            |               6 | STAR BAKER |
 |      8 |       2 | Steven     | Carter-Bailey |  34 | Marketer                                   | Watford, Hertfordshire          | Amarpressi Biscuits                                                               | ‘Check Bake’ Game                                                 |               6 | STAR BAKER |
 |      8 |       7 | Steven     | Carter-Bailey |  34 | Marketer                                   | Watford, Hertfordshire          | Italian Style Cannoli                                                             | ‘Sicilian-style’ Sfogliatelle                                     |               1 | STAR BAKER |
+|      6 |       7 | Tamal      | Ray           |  29 | Trainee anaesthetist                       | Manchester                      | Middle Eastern Game Pie                                                           | Spiced Blackberry, Raspberry and Cardamom Charlotte Russe         |               3 | STAR BAKER |
+|      7 |       3 | Tom        | Gilliford     |  26 | Project engagement manager                 | Rochdale                        | Chocolate Orange and Chilli Swirl Bread                                           | Jörmungandr and Mjölnir                                           |               4 | STAR BAKER |
+|      7 |       6 | Tom        | Gilliford     |  26 | Project engagement manager                 | Rochdale                        | Blood Orange Halloween Pumpkin Pie                                                | Floral Tea Cake                                                   |               1 | STAR BAKER |
 
 ``` r
 viewership_df <- 
