@@ -180,7 +180,7 @@ final_data %>%
   knitr::kable(., col.names = c("Season", "Episode", "First Name", "Last Name", "Age", "Occupation", "Hometown", "Signature Bake", "Show Stopper", "Technical Score", "Result")) 
 ```
 
-
+Tamal Ray and Benjama Ebuehi seem to be surprise winners because they only won once, but ended up being the star-baker.  Nadiya Hussain either got star-baker or won 4 times, so they seem like a predictable winner. Sophie Faldo and Steve Carter-Bailey both got star-baker or won 3 times. 
 
 ```{r}
 viewership_df <- 

@@ -289,6 +289,11 @@ final_data %>%
 |      7 |       3 | Tom        | Gilliford     |  26 | Project engagement manager                 | Rochdale                        | Chocolate Orange and Chilli Swirl Bread                                           | Jörmungandr and Mjölnir                                           |               4 | STAR BAKER |
 |      7 |       6 | Tom        | Gilliford     |  26 | Project engagement manager                 | Rochdale                        | Blood Orange Halloween Pumpkin Pie                                                | Floral Tea Cake                                                   |               1 | STAR BAKER |
 
+Tamal Ray and Benjama Ebuehi seem to be surprise winners because they
+only won once, but ended up being the star-baker. Nadiya Hussain either
+got star-baker or won 4 times, so they seem like a predictable winner.
+Sophie Faldo and Steve Carter-Bailey both got star-baker or won 3 times.
+
 ``` r
 viewership_df <- 
   read_csv("data_hw2/viewers.csv") %>% 
